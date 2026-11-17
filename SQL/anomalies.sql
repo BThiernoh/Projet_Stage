@@ -1,7 +1,13 @@
 -- REPERER LES ANOMALIES:
+-- Doublons avec le même id_cdr 
+SELECT id_cdr, COUNT(*) AS nb
+FROM CDR
+GROUP BY id_cdr
+HAVING COUNT(*) > 1
+ORDER BY nb DESC;
 
 -- Trouver toute les lignes ou l'horotatage est mauvais 
-SELECT * FROM CDR WHERE horodatage < '2026-09-01 00:00:01' OR horodatage > '2026-10-01 00:00:01';
+SELECT * FROM CDR WHERE horodatage = '1970-01-01';
 
 -- Reperer les lignes avec des abonnées inconnue 
 SELECT d.*
@@ -19,4 +25,4 @@ ORDER BY duree_sec DESC;
 SELECT *
 FROM CDR
 WHERE duree_sec < 0 OR volume_mo < 0 OR cout_gnf < 0
-LIMIT 100;
+LIMIT 100
