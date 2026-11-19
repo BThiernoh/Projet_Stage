@@ -16,6 +16,12 @@ FROM CDR d
 LEFT JOIN abonnes a ON d.id_abonne = a.id_abonne
 WHERE a.id_abonne IS NULL
 
+-- Cellules manquantes 
+SELECT COUNT(*) AS nb_cellules_vides
+FROM CDR
+WHERE id_cellule IS NULL
+   OR TRIM(id_cellule) = ''
+   
 -- Durée d'appel superieure à 3 heures 
 SELECT *
 FROM CDR
