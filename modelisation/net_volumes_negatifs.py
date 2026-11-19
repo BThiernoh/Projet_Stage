@@ -1,9 +1,8 @@
 import pandas as pd
 
-def nettoyage_volumes(fichier_source, fichier_destination):
+def nettoyage_volumes(df_cdr, fichier_destination):
 
     # Lire le fichier CDR
-    df_cdr = pd.read_csv(fichier_source)
 
     print("Taille initiale :", df_cdr.shape)
 
@@ -52,4 +51,5 @@ def nettoyage_volumes(fichier_source, fichier_destination):
     # Enregistrer le fichier nettoyé
     df_nettoye.to_csv(fichier_destination, index=False)
 
-    print("Fichier nettoyé enregistré :", fichier_destination)
+    print("Fichier final_nettoyé enregistré :", fichier_destination)
+    return df_nettoye

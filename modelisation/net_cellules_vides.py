@@ -1,9 +1,6 @@
 import pandas as pd
 
-def nettoyage_cellules_vides(fichier_source, fichier_destination):
-
- # Lire le fichier CDR
- df_cdr = pd.read_csv(fichier_source)
+def nettoyage_cellules_vides(df_cdr):
 
  print("Taille initiale :", df_cdr.shape)
 
@@ -18,6 +15,4 @@ def nettoyage_cellules_vides(fichier_source, fichier_destination):
  print("Taille après nettoyage :", df_nettoye.shape)
 
  # Enregistrer le nouveau fichier
- df_nettoye.to_csv(fichier_destination, index=False)
-
- print("Fichier nettoyé enregistré :", fichier_destination)
+ return df_nettoye 

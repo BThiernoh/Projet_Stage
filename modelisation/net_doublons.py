@@ -1,7 +1,6 @@
 # Fonction de nettoyage des doublons
 import pandas as pd 
-def nettoyage(fichier_source,fichier_destination): 
-    df_cdr = pd.read_csv(fichier_source)
+def nettoyage_doublons(df_cdr): 
     # Affichier la taille initiale
     print("Taille initial :", df_cdr.shape)
     # Identifier les lignes entièrement identiques
@@ -13,7 +12,4 @@ def nettoyage(fichier_source,fichier_destination):
     print("Taille après nettoyage :", df_nettoye.shape)
 
     # Enregistere les données nettoyées
-    df_nettoye.to_csv(fichier_destination, index =False)
-
-    print("Fichier nettoyé enregistré :", fichier_destination)
-
+    return df_nettoye

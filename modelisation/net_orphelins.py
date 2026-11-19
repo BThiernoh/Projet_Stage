@@ -1,10 +1,9 @@
 import pandas as pd
 
-def nettoyage_orphelins(fichier_cdr, fichier_abonne, fichier_destination):
+def nettoyage_orphelins(df_cdr):
 
- # Lire les fichiers CDR et abonnés
- df_cdr = pd.read_csv(fichier_cdr)
- df_ab = pd.read_csv(fichier_abonne)
+ # Lire le fichier abonnés
+ df_ab = pd.read_csv("../donnee/abonnes.csv")
 
  print("Taille initiale :", df_cdr.shape)
 
@@ -23,6 +22,4 @@ def nettoyage_orphelins(fichier_cdr, fichier_abonne, fichier_destination):
  print("Taille après nettoyage :", df_nettoye.shape)
 
  # Enregistrer le nouveau fichier
- df_nettoye.to_csv(fichier_destination, index=False)
-
- print("Fichier nettoyé enregistré :", fichier_destination)
+ return df_nettoye 
