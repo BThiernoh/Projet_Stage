@@ -1,4 +1,5 @@
 -- REPERER LES ANOMALIES:
+
 -- Doublons avec le même id_cdr 
 SELECT id_cdr, COUNT(*) AS nb
 FROM CDR

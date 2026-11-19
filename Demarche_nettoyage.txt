@@ -1,0 +1,139 @@
+Démarche : lignes en double dans CDR
+
+Constat : certains id_cdr apparaissent deux fois avec exactement les mêmes valeurs (par exemple 1720556 et 2238347 dans l’extrait). Un id_cdr est un identifiant, il doit être unique.
+
+Hypothèse : doublon technique (double insertion ou erreur d’extraction), pas deux vrais appels. Si c’était deux événements distincts, l’identifiant serait différent.
+
+Tests :
+
+Compter les id_cdr présents plus d’une fois :
+sql
+SELECT id_cdr, COUNT(*) AS nb
+FROM CDR GROUP BY id_cdr HAVING COUNT(*) > 1;
+Vérifier que toutes les colonnes sont identiques dans chaque doublon :
+sql
+SELECT id_cdr
+FROM CDR
+GROUP BY id_cdr
+HAVING COUNT(*) > 1
+   AND COUNT(DISTINCT CONCAT_WS('|', id_abonne, horodatage, type_service, direction,
+       duree_sec, volume_mo, id_cellule, id_correspondant, statut, cout_gnf)) = 1;
+
+Si un id_cdr apparaît dans la première requête mais pas dans la seconde, ses deux lignes diffèrent et il faut les examiner à part.
+
+Décision : pour les doublons strictement identiques, je garde une seule ligne et je supprime les autres. Garder les deux compterait deux fois le même volume et le même coût.
+
+Précautions : sauvegarde de la table, contrôle du nombre de lignes avant et après (le nombre supprimé doit égaler le nombre d’excédents), puis ajout d’une clé primaire sur id_cdr pour empêcher le retour des doublons :
+
+Limite : cette méthode suppose que les doublons sont des copies exactes. Un même id_cdr avec des valeurs différentes n’est pas un simple doublon et doit être traité à part. Ordre conseillé : dédoublonner d’abord, puis corriger les volumes négatifs, pour que les statistiques (médiane, comptages) ne soient pas faussées par les copies.
+
+###############################################################################################################################################################################################################################################################
+Démarche : horodatages au 1970-01-01 dans CDR
+
+Constat : certaines lignes ont un horodatage égal à 1970-01-01. C’est l’époque Unix, la valeur « zéro » qu’on obtient quand une date est absente ou illisible. La table couvre septembre 2026, donc ces dates sont impossibles.
+
+Hypothèse : ce ne sont pas de vrais appels, mais des lignes dont la date n’a pas été enregistrée correctement.
+
+Test : compter ces lignes avant de supprimer.
+
+sql
+SELECT COUNT(*) AS nb_1970
+FROM CDR
+WHERE horodatage = '1970-01-01'
+
+
+Décision : je les supprime directement. La vraie date est inconnue et ne peut pas être reconstruite. Les garder fausserait les analyses par jour, par heure et par semaine.
+
+Précautions : sauvegarde de la table, comptage avant et après (le nombre supprimé doit égaler nb_1970), transaction, vérification qu’il ne reste aucune date de 1970. Je vérifie aussi qu’il n’y a pas de dates en 1969-12-31 (décalage horaire) :
+
+Limite : cette suppression ne traite que le cas 1970. D’autres dates aberrantes (hors septembre 2026) sont traitées par le contrôle de période, fait séparément.
+
+############################################################################################################################################################################################################
+Démarche : volumes négatifs dans CDR
+
+Constat : 591 lignes data sur 1,18 million (0,05 %) ont un volume_mo négatif, ce qui est impossible. Leur cout_gnf est positif et normal.
+
+Hypothèse : erreur de signe à la saisie ou à l’extraction.
+
+Tests :
+
+WITH med AS (
+   SELECT DISTINCT
+          volume_mo AS vol,
+          COUNT(*) OVER (PARTITION BY volume_mo) AS nb_pos,
+          MEDIAN(cout_gnf) OVER (PARTITION BY volume_mo) AS med_pos
+   FROM CDR
+   WHERE volume_mo > 0
+ )
+ SELECT n.id_cdr, n.volume_mo, n.cout_gnf,
+        m.nb_pos, m.med_pos,
+        ROUND(n.cout_gnf - m.med_pos, 2) AS ecart,
+        (ABS(n.cout_gnf - m.med_pos) < 0.5) AS egal_mediane
+ FROM CDR n
+ JOIN med m ON m.vol = -n.volume_mo
+ WHERE n.volume_mo < 0;
+
+Le coût moyen par Mo est le même pour les négatifs et les positifs (7,57 contre 7,55 GNF/Mo).
+Aucune ligne positive jumelle (même abonné, même heure, même cellule) : ce ne sont pas des doublons.
+J’ai comparé le coût de chaque négatif à la médiane des coûts positifs de même volume absolu (la médiane résiste aux valeurs extrêmes). La plupart sont égaux à la médiane, les autres sont en dessous, souvent à environ 70 %.
+
+Décision :
+
+Coût égal à la médiane : la ligne est cohérente, donc je corrige le signe (volume_mo = -volume_mo).
+Coût différent : la ligne est jugée non fiable, donc je la supprime.
+
+Précautions : sauvegarde de la table, contrôle des effectifs, transaction, vérification qu’il ne reste aucun négatif.
+
+Limite : les coûts à environ 70 % ressemblent à un tarif réduit légitime. Avant de supprimer, je vérifie si les positifs ont la même proportion. Si oui, je corrige tout avec ABS(volume_mo) sans rien supprimer.
+
+########################################################################################################################################################################################################################################################################################################
+
+Démarche : abonnés de CDR absents de la table abonnes
+
+Constat : 3 083 lignes de CDR (0,10 % de la table) portent sur 499 id_abonne qui n’existent pas dans abonnes. L’intégrité référentielle est cassée : on ne peut pas rattacher ces lignes à un abonné (région, forfait, etc.).
+
+Hypothèse : abonnés supprimés ou jamais chargés dans abonnes, ou identifiants erronés dans CDR. Environ 6 lignes par abonné absent, donc ce sont des abonnés entiers qui manquent, pas des fautes de frappe isolées.
+
+Test : jointure LEFT JOIN entre CDR et abonnes, puis recherche des id_abonne sans correspondance.
+
+Décision : je supprime ces lignes. Elles ne peuvent pas être rattachées à un profil, et leur poids (0,10 %) est négligeable sur les totaux.
+
+Précautions : sauvegarde de la table, comptage avant et après (le nombre supprimé doit valoir 3 083), transaction, contrôle final (aucun orphelin restant).
+
+Limite : ce sont probablement de vrais appels, donc leur suppression sous-estime très légèrement le trafic et le coût totaux. Les lignes supprimées restent conservées dans la table de sauvegarde pour garder la trace.
+
+#################################################################################################################################################################################################################################################################################################
+
+Démarche : identifiant de cellule manquant dans CDR
+
+Constat : certaines lignes de CDR n’ont pas d’id_cellule (par exemple id_cdr 1131941 dans l’extrait). Sans cellule, on ne peut pas localiser l’appel, ce qui bloque les analyses par zone et la mobilité à Conakry.
+
+Hypothèse : perte de la valeur à l’enregistrement ou à l’extraction. Je vérifie si les valeurs manquantes sont des NULL ou des chaînes vides, car les deux s’affichent de la même façon et se filtrent différemment.
+
+Tests :
+-- 1. Combien de lignes, et sous quelle forme
+SELECT SUM(id_cellule IS NULL) AS nulles,
+       SUM(id_cellule = '')    AS vides,
+       SUM(id_cellule IS NULL OR TRIM(id_cellule) = '') AS total_manquantes,
+       ROUND(100 * SUM(id_cellule IS NULL OR TRIM(id_cellule) = '') / COUNT(*), 3) AS pct_cdr
+FROM CDR;
+Décision : je ne cherche pas à reconstituer la cellule. Déduire la cellule d’un autre appel de l’abonné serait une supposition, car un abonné change de cellule en se déplaçant, et ça fausserait justement l’analyse de mobilité. Je supprime donc ces lignes, car leur poids est négligeable.
+
+Précautions : sauvegarde de la table, comptage avant et après (le nombre supprimé doit égaler total_manquantes), transaction, contrôle final.
+
+Limite : ce sont probablement de vrais appels, donc leur suppression sous-estime légèrement le trafic et le coût totaux. Si pct_cdr dépasse environ 1 %, je ne supprime pas : je garde les lignes pour les totaux globaux et je les exclus seulement des analyses par cellule.
+
+##################################################################################################################################################################################
+
+Démarche : durées supérieures à 24 h dans CDR
+
+Constat : duree_sec ne devrait pas dépasser 86 400 s (24 h). Environ 220 lignes, soit 0,0186 % de la table, dépassent ce seuil.
+
+Hypothèse : erreur de mesure ou de saisie (session jamais fermée, unité erronée comme des millisecondes au lieu de secondes). Ces valeurs fausseraient les durées moyennes et les débits.
+
+Test : comptage des lignes avec duree_sec > 86400, de leur minimum et maximum, et de leur part dans la table.
+
+Décision : je les supprime directement. La vraie durée est inconnue et ne peut pas être reconstruite, et leur poids (0,0186 %) est négligeable.
+Précautions : sauvegarde de la table, comptage avant et après (le nombre supprimé doit égaler nb_plus_24h), transaction, contrôle final.
+
+Limite : le seuil de 24 h est un seuil de bon sens, pas un seuil statistique. Il n’écarte que les valeurs impossibles. Des durées de plusieurs heures mais inférieures à 24 h peuvent encore être suspectes, surtout si le volume est faible.
