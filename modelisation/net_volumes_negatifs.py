@@ -1,11 +1,12 @@
 import pandas as pd
+import logging
+logger = logging.getLogger(__name__)
 
-def nettoyage_volumes(df_cdr, fichier_destination):
+def nettoyage_volumes(df_cdr):
 
     # Lire le fichier CDR
 
-    print("Taille initiale :", df_cdr.shape)
-
+    logger.info("Volumes : taille initiale %s", df_cdr.shape)
     # Calculer la médiane des coûts pour chaque volume positif
     references = (
     df_cdr[df_cdr["volume_mo"] > 0]
@@ -43,13 +44,10 @@ def nettoyage_volumes(df_cdr, fichier_destination):
     )
 
     # Afficher le bilan
-    print("Volumes négatifs détectés :", len(negatifs))
-    print("Volumes corrigés :", len(coherents))
-    print("Volumes supprimés :", len(non_fiables))
-    print("Taille après nettoyage :", df_nettoye.shape)
+    logger.info("Volumes : %d négatif(s) détecté(s)", len(negatifs))
+    logger.info("Volumes : %d corrigé(s)", len(coherents))
+    logger.warning("Volumes : %d ligne(s) non fiable(s) supprimée(s)", len(non_fiables))
+    logger.info("Volumes : taille après nettoyage %s", df_nettoye.shape)
 
     # Enregistrer le fichier nettoyé
-    df_nettoye.to_csv(fichier_destination, index=False)
-
-    print("Fichier final_nettoyé enregistré :", fichier_destination)
     return df_nettoye

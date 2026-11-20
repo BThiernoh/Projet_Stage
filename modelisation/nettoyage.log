@@ -1,0 +1,44 @@
+2026-11-20 10:14:06,881 | INFO     | nettoyage | Fichier chargé : ../donnee/cdr_complet.csv (3085835, 11)
+2026-11-20 10:14:06,882 | INFO     | net_doublons | Doublons : taille initiale (3085835, 11)
+2026-11-20 10:14:07,705 | INFO     | net_doublons | Doublons : 15352 ligne(s) en double
+2026-11-20 10:14:09,232 | INFO     | net_doublons | Doublons : taille après nettoyage (3070483, 11)
+2026-11-20 10:14:09,249 | INFO     | net_horodatage | Horodatage : taille initiale (3070483, 11)
+2026-11-20 10:14:09,352 | INFO     | net_horodatage | Horodatage : 614 ligne(s) au 1er janvier 1970
+2026-11-20 10:14:09,565 | INFO     | net_horodatage | Horodatage : taille après nettoyage (3069869, 11)
+2026-11-20 10:14:09,587 | INFO     | net_orphelins | Orphelins : taille initiale (3069869, 11)
+2026-11-20 10:14:09,598 | INFO     | net_orphelins | Orphelins : 3070 ligne(s) CDR orpheline(s)
+2026-11-20 10:14:09,681 | INFO     | net_orphelins | Orphelins : taille après nettoyage (3066799, 11)
+2026-11-20 10:14:09,698 | INFO     | net_cellules_vides | Cellules vides : taille initiale (3066799, 11)
+2026-11-20 10:14:09,722 | INFO     | net_cellules_vides | Cellules vides : 9191 id_cellule manquant(s)
+2026-11-20 10:14:09,793 | INFO     | net_cellules_vides | Cellules vides : taille après nettoyage (3057608, 11)
+2026-11-20 10:14:09,809 | INFO     | net_appel_longs | Appels longs : taille initiale (3057608, 11)
+2026-11-20 10:14:09,973 | INFO     | net_appel_longs | Appels longs : 570 appel(s) vocal(aux) de plus de 24 h
+2026-11-20 10:14:10,052 | INFO     | net_appel_longs | Appels longs : taille après nettoyage (3057038, 11)
+2026-11-20 10:14:10,068 | INFO     | net_volumes_negatifs | Volumes : taille initiale (3057038, 11)
+2026-11-20 10:14:10,251 | INFO     | net_volumes_negatifs | Volumes : 587 négatif(s) détecté(s)
+2026-11-20 10:14:10,251 | INFO     | net_volumes_negatifs | Volumes : 478 corrigé(s)
+2026-11-20 10:14:10,251 | WARNING  | net_volumes_negatifs | Volumes : 109 ligne(s) non fiable(s) supprimée(s)
+2026-11-20 10:14:10,251 | INFO     | net_volumes_negatifs | Volumes : taille après nettoyage (3056929, 11)
+2026-11-20 10:14:13,137 | INFO     | nettoyage | Fichier final enregistré : cdr_propre.csv
+2026-11-20 10:16:19,035 | INFO     | nettoyage | Fichier chargé : ../donnee/cdr_complet.csv (3085835, 11)
+2026-11-20 10:16:19,039 | INFO     | net_doublons | Doublons : taille initiale (3085835, 11)
+2026-11-20 10:16:19,852 | INFO     | net_doublons | Doublons : 15352 ligne(s) en double
+2026-11-20 10:16:21,384 | INFO     | net_doublons | Doublons : taille après nettoyage (3070483, 11)
+2026-11-20 10:16:21,401 | INFO     | net_horodatage | Horodatage : taille initiale (3070483, 11)
+2026-11-20 10:16:21,504 | INFO     | net_horodatage | Horodatage : 614 ligne(s) au 1er janvier 1970
+2026-11-20 10:16:21,724 | INFO     | net_horodatage | Horodatage : taille après nettoyage (3069869, 11)
+2026-11-20 10:16:21,749 | INFO     | net_orphelins | Orphelins : taille initiale (3069869, 11)
+2026-11-20 10:16:21,760 | INFO     | net_orphelins | Orphelins : 3070 ligne(s) CDR orpheline(s)
+2026-11-20 10:16:21,843 | INFO     | net_orphelins | Orphelins : taille après nettoyage (3066799, 11)
+2026-11-20 10:16:21,860 | INFO     | net_cellules_vides | Cellules vides : taille initiale (3066799, 11)
+2026-11-20 10:16:21,881 | INFO     | net_cellules_vides | Cellules vides : 9191 id_cellule manquant(s)
+2026-11-20 10:16:21,949 | INFO     | net_cellules_vides | Cellules vides : taille après nettoyage (3057608, 11)
+2026-11-20 10:16:21,965 | INFO     | net_appel_longs | Appels longs : taille initiale (3057608, 11)
+2026-11-20 10:16:22,133 | INFO     | net_appel_longs | Appels longs : 570 appel(s) vocal(aux) de plus de 24 h
+2026-11-20 10:16:22,215 | INFO     | net_appel_longs | Appels longs : taille après nettoyage (3057038, 11)
+2026-11-20 10:16:22,231 | INFO     | net_volumes_negatifs | Volumes : taille initiale (3057038, 11)
+2026-11-20 10:16:22,401 | INFO     | net_volumes_negatifs | Volumes : 587 négatif(s) détecté(s)
+2026-11-20 10:16:22,401 | INFO     | net_volumes_negatifs | Volumes : 478 corrigé(s)
+2026-11-20 10:16:22,401 | WARNING  | net_volumes_negatifs | Volumes : 109 ligne(s) non fiable(s) supprimée(s)
+2026-11-20 10:16:22,401 | INFO     | net_volumes_negatifs | Volumes : taille après nettoyage (3056929, 11)
+2026-11-20 10:16:25,188 | INFO     | nettoyage | Fichier final enregistré : ../donnee/cdr_propre.csv
