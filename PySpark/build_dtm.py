@@ -6,7 +6,7 @@ cellules = pd.read_csv("../donnee/cellules.csv")   # id_cellule, zone
 
 # 2. Ajouter la zone et la colonne d'échec
 cdr = cdr.merge(cellules[["id_cellule", "zone"]], on="id_cellule", how="left")
-cdr["echec"] = (cdr["statut"] != "reussi").astype(int)
+cdr["echec"] = (cdr["statut"] != "ok").astype(int)
 
 # 3. Trafic par service : une colonne par service
 trafic = cdr.pivot_table(
@@ -30,6 +30,4 @@ dtm.to_parquet("output/dtm/dtm_zone_heure.parquet")
 # 7. Vérifier
 print(dtm.shape, dtm.duplicated(["zone", "date", "heure"]).sum() == 0)
 print("Zones manquantes :", cdr["zone"].isna().sum())
-print(dtm.head(5))
-
-print(cdr["statut"].value_counts(dropna=False))
+print(dtm.head(10))

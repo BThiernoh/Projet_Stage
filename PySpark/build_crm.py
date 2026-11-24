@@ -4,7 +4,7 @@ import pandas as pd
 cdr = pd.read_parquet("sortie/dwh/cdr")
 
 # 2. Colonnes de travail
-cdr["echec"] = (cdr["statut"] != "reussi").astype(int)
+cdr["echec"] = (cdr["statut"] != "ok").astype(int)
 cdr["is_appel"] = (cdr["type_service"] == "voix").astype(int)
 cdr["min_voix"] = cdr["duree_sec"].where(cdr["type_service"] == "voix", 0) / 60
 cdr["mo_data"] = cdr["volume_mo"].where(cdr["type_service"] == "data", 0)
@@ -24,4 +24,4 @@ crm.to_parquet("output/crm/crm_abonnes.parquet")
 
 # 5. Vérifier
 print(crm.shape, crm["id_abonne"].is_unique)
-print(crm.to_string())
+print(crm.head(10))

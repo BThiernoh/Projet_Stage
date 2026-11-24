@@ -12,3 +12,4 @@ Le dossier  (partionée par date) est donc plus lourd que le fichier d'origine
 | Spark  | CSV     |       1.15  |                          |
 | Spark  | Parquet |       0.62 |   476 Ko(~0,5)         |  
 
+correction des fonctions car j'avais un taux d'echec constant = 1,  
