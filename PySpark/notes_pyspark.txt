@@ -1,0 +1,14 @@
+CDR nettoyé (CSV) et ajoute deux colonnes, date et heure, extraites de l'horodatage. Il l'enregistre ensuite en Parquet dans sortie/dwh/cdr, avec un sous-dossier par jour. Le format est ainsi plus léger et plus rapide à lire, et prêt pour construire le CRM et le DTM.
+
+Taille d'un fichier : du -sh /chemin/dossier (-s résume le total, -h rend la taille lisible).
+ø 217M    sortie
+ø 210M    ../donnee/cdr_propre.csv
+Le dossier  (partionée par date) est donc plus lourd que le fichier d'origine 
+
+| Outil  | Format  | Temps_requette (s) | Taille (Mo) |
+|--------|---------|-------------|------------|
+| pandas | CSV     |      1.29   |      210      |
+| pandas | Parquet |       1.37 |     217       |
+| Spark  | CSV     |       1.15  |                          |
+| Spark  | Parquet |       0.62 |   476 Ko(~0,5)         |  
+
