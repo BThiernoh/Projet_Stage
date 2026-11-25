@@ -27,7 +27,7 @@ Précautions : sauvegarde de la table, contrôle du nombre de lignes avant et ap
 
 Limite : cette méthode suppose que les doublons sont des copies exactes. Un même id_cdr avec des valeurs différentes n’est pas un simple doublon et doit être traité à part. Ordre conseillé : dédoublonner d’abord, puis corriger les volumes négatifs, pour que les statistiques (médiane, comptages) ne soient pas faussées par les copies.
 
-###############################################################################################################################################################################################################################################################
+#######################################################################################################
 Démarche : horodatages au 1970-01-01 dans CDR
 
 Constat : certaines lignes ont un horodatage égal à 1970-01-01. C’est l’époque Unix, la valeur « zéro » qu’on obtient quand une date est absente ou illisible. La table couvre septembre 2026, donc ces dates sont impossibles.
@@ -48,8 +48,8 @@ Précautions : sauvegarde de la table, comptage avant et après (le nombre suppr
 
 Limite : cette suppression ne traite que le cas 1970. D’autres dates aberrantes (hors septembre 2026) sont traitées par le contrôle de période, fait séparément.
 
-############################################################################################################################################################################################################
-Démarche : volumes négatifs dans CDR
+#######################################################################################################
+Démarche : volumes _mo négatifs dans CDR
 
 Constat : 591 lignes data sur 1,18 million (0,05 %) ont un volume_mo négatif, ce qui est impossible. Leur cout_gnf est positif et normal.
 
@@ -86,7 +86,7 @@ Précautions : sauvegarde de la table, contrôle des effectifs, transaction, vé
 
 Limite : les coûts à environ 70 % ressemblent à un tarif réduit légitime. Avant de supprimer, je vérifie si les positifs ont la même proportion. Si oui, je corrige tout avec ABS(volume_mo) sans rien supprimer.
 
-########################################################################################################################################################################################################################################################################################################
+#######################################################################################################
 
 Démarche : abonnés de CDR absents de la table abonnes
 
@@ -102,7 +102,7 @@ Précautions : sauvegarde de la table, comptage avant et après (le nombre suppr
 
 Limite : ce sont probablement de vrais appels, donc leur suppression sous-estime très légèrement le trafic et le coût totaux. Les lignes supprimées restent conservées dans la table de sauvegarde pour garder la trace.
 
-#################################################################################################################################################################################################################################################################################################
+#######################################################################################################
 
 Démarche : identifiant de cellule manquant dans CDR
 
@@ -117,13 +117,14 @@ SELECT SUM(id_cellule IS NULL) AS nulles,
        SUM(id_cellule IS NULL OR TRIM(id_cellule) = '') AS total_manquantes,
        ROUND(100 * SUM(id_cellule IS NULL OR TRIM(id_cellule) = '') / COUNT(*), 3) AS pct_cdr
 FROM CDR;
+
 Décision : je ne cherche pas à reconstituer la cellule. Déduire la cellule d’un autre appel de l’abonné serait une supposition, car un abonné change de cellule en se déplaçant, et ça fausserait justement l’analyse de mobilité. Je supprime donc ces lignes, car leur poids est négligeable.
 
 Précautions : sauvegarde de la table, comptage avant et après (le nombre supprimé doit égaler total_manquantes), transaction, contrôle final.
 
 Limite : ce sont probablement de vrais appels, donc leur suppression sous-estime légèrement le trafic et le coût totaux. Si pct_cdr dépasse environ 1 %, je ne supprime pas : je garde les lignes pour les totaux globaux et je les exclus seulement des analyses par cellule.
 
-##################################################################################################################################################################################
+#######################################################################################################
 
 Démarche : durées supérieures à 24 h dans CDR
 

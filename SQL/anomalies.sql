@@ -21,11 +21,11 @@ SELECT COUNT(*) AS nb_cellules_vides
 FROM CDR
 WHERE id_cellule IS NULL
    OR TRIM(id_cellule) = ''
-   
+
 -- Durée d'appel superieure à 3 heures 
 SELECT *
 FROM CDR
-WHERE duree_sec > 10800
+WHERE duree_sec > 86400
 ORDER BY duree_sec DESC;
 
 -- Au moins 1 valeurs du tableau est négative

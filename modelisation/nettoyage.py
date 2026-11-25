@@ -17,7 +17,7 @@ def nettoyage(fichier_cdr, fichier_destination):
     df = pd.read_csv(fichier_cdr)
     logger.info("Fichier chargé : %s %s", fichier_cdr, df.shape)
 
-    df = nettoyage_doublons(df)                  # 1. doublons
+    df = nettoyage_doublons(df)         # 1. doublons
     df = nettoyage_horodatage(df)       # 2. horodatage 1970
     df = nettoyage_orphelins(df)        # 3. orphelins
     df = nettoyage_cellules_vides(df)   # 4. cellules vides
